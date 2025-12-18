@@ -84,16 +84,18 @@ Uses Interquartile Range (IQR) method with a factor of 1.5 to detect statistical
 
 ## Testing
 
-Run the test suite:
+Activate the virtual environment and run the test suite:
 
-
-pytest tests/
-
+```bash
+source /workspaces/.venv/bin/activate  # Or use the full path if not activated
+/workspaces/.venv/bin/python -m pytest tests/
+```
 
 Or run individual test files:
-
-pytest tests/test_validation.py
-pytest tests/test_anomaly.py
+```bash
+/workspaces/.venv/bin/python -m pytest tests/test_validation.py
+/workspaces/.venv/bin/python -m pytest tests/test_anomaly.py
+```
 
 
 ## CI/CD

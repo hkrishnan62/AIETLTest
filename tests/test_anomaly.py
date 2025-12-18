@@ -11,15 +11,15 @@ class TestAnomalyDetector(unittest.TestCase):
         # Create DataFrame with one clear outlier in 'value' column
         data = {'id': list(range(1, 12)), 'value': [100]*10 + [1000]}
         df = pd.DataFrame(data)
-        anomalies = self.detector.scan(df, context="extract")
+        mask = self.detector.detect(df, columns=['value'])
+        anomalies = df[mask]
         # Should detect the last record (id=11) as an outlier
         self.assertEqual(len(anomalies), 1)
-        self.assertEqual(anomalies[0]['record_id'], 11)
-        self.assertEqual(anomalies[0]['field'], 'value')
+        self.assertEqual(anomalies.iloc[0]['id'], 11)
 
     def test_no_anomaly(self):
         # Data with no outlier
         data = {'id': [1,2,3], 'score': [10, 12, 11]}
         df = pd.DataFrame(data)
-        anomalies = self.detector.scan(df)
-        self.assertEqual(len(anomalies), 0)
+        mask = self.detector.detect(df, columns=['score'])
+        self.assertEqual(mask.sum(), 0)

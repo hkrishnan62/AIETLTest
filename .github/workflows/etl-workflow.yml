@@ -27,7 +27,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        python -m pytest tests/ --tb=short > logs/test_results.log 2>&1
+        echo "Tests completed" >> logs/test_results.log
 
     - name: Run ETL Orchestrator
       run: |
@@ -57,6 +62,14 @@ jobs:
             except:
                 metrics = {'error': 'Could not parse metrics'}
         
+        # Read test results
+        test_content = ''
+        try:
+            with open('logs/test_results.log', 'r') as f:
+                test_content = f.read()
+        except:
+            test_content = 'Test results not available'
+        
         # Generate HTML
         html = f'''
         <!DOCTYPE html>
@@ -74,6 +87,7 @@ jobs:
                 th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
                 th {{ background-color: #f2f2f2; }}
                 pre {{ background: #f8f8f8; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; }}
+                .tests {{ background: #f0f8e0; padding: 10px; border-left: 5px solid #4caf50; margin: 10px 0; }}
             </style>
         </head>
         <body>
@@ -96,7 +110,11 @@ jobs:
         
         html += f'''
                 </table>
-                <h2>Full Log</h2>
+                <div class=\"tests\">
+                    <h2>Test Results</h2>
+                    <pre>{test_content}</pre>
+                </div>
+                <h2>Full ETL Log</h2>
                 <pre>{log_content}</pre>
             </div>
         </body>
