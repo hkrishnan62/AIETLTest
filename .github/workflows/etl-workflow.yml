@@ -37,9 +37,46 @@ jobs:
         echo "ETL completed" >> ../logs/etl_output.log
         cat ../logs/etl_output.log
 
+    - name: Generate HTML Report
+      if: success()
+      run: |
+        LOG_FILE="logs/etl_output.log"
+        HTML_FILE="logs/etl_report.html"
+        cat > $HTML_FILE << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>ETL Execution Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+                .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                h1 { color: #333; text-align: center; }
+                pre { background: #f8f8f8; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; }
+                .metrics { background: #e8f4fd; padding: 10px; border-left: 5px solid #007acc; margin: 10px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>ETL Pipeline Execution Report</h1>
+                <p><strong>Execution Date:</strong> $(date)</p>
+                <div class="metrics">
+                    <h2>Metrics</h2>
+                    <pre>$(grep "Metrics:" $LOG_FILE | sed 's/Metrics: //')</pre>
+                </div>
+                <h2>Full Log</h2>
+                <pre>$(cat $LOG_FILE)</pre>
+            </div>
+        </body>
+        </html>
+        EOF
+
     - name: Upload logs
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: etl-logs
-        path: logs/etl_output.log
+        path: |
+          logs/etl_output.log
+          logs/etl_report.html
