@@ -1,37 +1,63 @@
-# src/validation/anomaly_detector.py
+# src/validation/rule_validator.py
 import pandas as pd
 
-class AnomalyDetector:
+class RuleValidator:
     """
-    Performs statistical anomaly detection using the IQR method.
+    Applies various validation rules:
+    - Null/missing value checks in required fields.
+    - Duplicate ID checks.
+    - Numeric range checks.
+    - Category membership checks.
     """
 
-    def __init__(self, factor=1.5):
-        self.factor = factor  # Multiplier for IQR (default 1.5)
+    def __init__(self, required_columns=None, allowed_ranges=None, allowed_categories=None):
+        """
+        Initialize with rules:
+        - required_columns: list of columns that must not be null.
+        - allowed_ranges: dict {column: (min, max)} for numeric range validation.
+        - allowed_categories: dict {column: [allowed_values]} for category validation.
+        """
+        self.required_columns = required_columns or []
+        self.allowed_ranges = allowed_ranges or {}
+        self.allowed_categories = allowed_categories or {}
 
-    def detect_iqr(self, series):
-        """
-        Detect outliers in a pandas Series using the IQR rule.
-        Returns a boolean mask (True for outlier).
-        """
-        if series.empty:
-            return pd.Series(dtype=bool)
-        q1 = series.quantile(0.25)
-        q3 = series.quantile(0.75)
-        iqr = q3 - q1
-        lower_bound = q1 - (iqr * self.factor)
-        upper_bound = q3 + (iqr * self.factor)
-        return (series < lower_bound) | (series > upper_bound)
-
-    def detect(self, df, columns=None):
-        """
-        Detect anomalies across specified numeric columns of the DataFrame.
-        Returns a boolean mask (True if any column has an outlier).
-        """
-        if columns is None:
-            columns = df.select_dtypes(include=['number']).columns.tolist()
+    def check_nulls(self, df):
+        """Return a mask for rows with nulls in any required column."""
         mask = pd.Series(False, index=df.index)
-        for col in columns:
+        for col in self.required_columns:
             if col in df.columns:
-                mask |= self.detect_iqr(df[col])
+                mask |= df[col].isnull()
         return mask
+
+    def check_duplicates(self, df, subset):
+        """Return a mask for rows that are duplicates based on subset of columns."""
+        return df.duplicated(subset=subset, keep=False)
+
+    def check_ranges(self, df):
+        """Return a mask for rows with values outside the allowed numeric ranges."""
+        mask = pd.Series(False, index=df.index)
+        for col, (min_val, max_val) in self.allowed_ranges.items():
+            if col in df.columns:
+                mask |= (df[col] < min_val) | (df[col] > max_val)
+        return mask
+
+    def check_categories(self, df):
+        """Return a mask for rows with invalid category values."""
+        mask = pd.Series(False, index=df.index)
+        for col, valid_vals in self.allowed_categories.items():
+            if col in df.columns:
+                mask |= ~df[col].isin(valid_vals)
+        return mask
+
+    def validate(self, df):
+        """
+        Perform all checks and return a DataFrame with boolean flags:
+        columns: null_or_missing, duplicate_id, range_violation, invalid_category, and anomaly (any).
+        """
+        results = pd.DataFrame(index=df.index)
+        results['null_or_missing'] = self.check_nulls(df)
+        results['duplicate_id'] = self.check_duplicates(df, subset=['id'])
+        results['range_violation'] = self.check_ranges(df)
+        results['invalid_category'] = self.check_categories(df)
+        results['anomaly'] = results.any(axis=1)  # True if any check failed
+        return results
