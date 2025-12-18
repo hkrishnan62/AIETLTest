@@ -39,92 +39,7 @@ jobs:
       run: |
         mkdir -p logs
         cd src
-        python orchestrator.py > ../logs/etl_output.log 2>&1
-        echo "ETL completed" >> ../logs/etl_output.log
-        cat ../logs/etl_output.log
-
-    - name: Generate HTML Report
-      if: success()
-      run: |
-        python3 -c "
-        import json
-        import re
-        from datetime import datetime
-        
-        with open('logs/etl_output.log', 'r') as f:
-            log_content = f.read()
-        
-        # Extract metrics
-        metrics_match = re.search(r'Metrics: ({.*})', log_content)
-        metrics = {}
-        if metrics_match:
-            try:
-                metrics = eval(metrics_match.group(1))
-            except:
-                metrics = {'error': 'Could not parse metrics'}
-        
-        # Read test results
-        test_content = ''
-        try:
-            with open('logs/test_results.log', 'r') as f:
-                test_content = f.read()
-        except:
-            test_content = 'Test results not available'
-        
-        # Generate HTML
-        html = f'''
-        <!DOCTYPE html>
-        <html lang=\"en\">
-        <head>
-            <meta charset=\"UTF-8\">
-            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-            <title>ETL Execution Report</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }}
-                .container {{ max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
-                h1 {{ color: #333; text-align: center; }}
-                .summary {{ background: #e8f4fd; padding: 15px; border-radius: 5px; margin: 10px 0; }}
-                table {{ width: 100%; border-collapse: collapse; margin: 10px 0; }}
-                th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                th {{ background-color: #f2f2f2; }}
-                pre {{ background: #f8f8f8; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; }}
-                .tests {{ background: #f0f8e0; padding: 10px; border-left: 5px solid #4caf50; margin: 10px 0; }}
-            </style>
-        </head>
-        <body>
-            <div class=\"container\">
-                <h1>ETL Pipeline Execution Report</h1>
-                <p><strong>Execution Date:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-                <div class=\"summary\">
-                    <h2>Summary</h2>
-                    <p>Records processed: {metrics.get('total_records', 'N/A')}</p>
-                    <p>Anomalies detected: {metrics.get('total_anomalies_detected', 'N/A')}</p>
-                    <p>Clean records: {metrics.get('cleaned_records', 'N/A')}</p>
-                </div>
-                <h2>Detailed Metrics</h2>
-                <table>
-                    <tr><th>Metric</th><th>Value</th></tr>
-        '''
-        
-        for key, value in metrics.items():
-            html += f'<tr><td>{key.replace(\"_\", \" \").title()}</td><td>{value}</td></tr>'
-        
-        html += f'''
-                </table>
-                <div class=\"tests\">
-                    <h2>Test Results</h2>
-                    <pre>{test_content}</pre>
-                </div>
-                <h2>Full ETL Log</h2>
-                <pre>{log_content}</pre>
-            </div>
-        </body>
-        </html>
-        '''
-        
-        with open('logs/etl_report.html', 'w') as f:
-            f.write(html)
-        "
+        python orchestrator.py
 
     - name: Upload logs
       if: success()
@@ -133,4 +48,4 @@ jobs:
         name: etl-logs
         path: |
           logs/etl_output.log
-          logs/etl_report.html
+          logs/csv_anomaly_report.html
