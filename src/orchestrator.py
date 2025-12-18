@@ -3,8 +3,8 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
-from validation.rule_validator import RuleValidator
-from validation.anomaly_detector import AnomalyDetector
+from validator.rule_validator import RuleValidator
+from validator.anomaly_detector import AnomalyDetector
 
 class ETLOrchestrator:
     """
@@ -76,8 +76,8 @@ class ETLOrchestrator:
 
 if __name__ == "__main__":
     # Example execution
-    orchestrator = ETLOrchestrator(data_path="data/synthetic_data.csv")
+    orchestrator = ETLOrchestrator(data_path="../data/synthetic_data.csv")
     raw_df = orchestrator.extract()
     cleaned_df, metrics = orchestrator.transform(raw_df)
-    orchestrator.load(cleaned_df, "data/cleaned_data.csv")
+    orchestrator.load(cleaned_df, "../data/cleaned_data.csv")
     print("Metrics:", metrics)
