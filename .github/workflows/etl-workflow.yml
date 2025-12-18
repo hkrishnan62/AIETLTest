@@ -49,3 +49,38 @@ jobs:
         path: |
           logs/etl_output.log
           logs/csv_anomaly_report.html
+
+  advanced-etl-testing:
+    runs-on: ubuntu-latest
+    needs: run-etl
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Advanced Test Orchestrator
+      run: |
+        mkdir -p logs
+        cd src
+        python test_orchestrator.py
+
+    - name: Upload Test Orchestrator Reports
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-orchestrator-reports
+        path: |
+          logs/test_orchestrator_report.txt
+          logs/test_dashboard.html
+          logs/evaluation_plots.png
+          logs/test_orchestrator.log

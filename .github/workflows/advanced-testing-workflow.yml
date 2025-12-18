@@ -1,0 +1,123 @@
+name: Advanced ETL Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      halt_on_critical:
+        description: 'Halt execution on critical failures'
+        required: false
+        default: 'false'
+        type: boolean
+      max_anomaly_rate:
+        description: 'Maximum allowed anomaly rate (%)'
+        required: false
+        default: '10.0'
+        type: string
+      log_level:
+        description: 'Logging level (DEBUG, INFO, WARNING, ERROR)'
+        required: false
+        default: 'INFO'
+        type: choice
+        options:
+        - DEBUG
+        - INFO
+        - WARNING
+        - ERROR
+
+jobs:
+  advanced-testing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create test data
+      run: |
+        mkdir -p data logs
+        # Ensure synthetic data exists
+        if [ ! -f "data/synthetic_data.csv" ]; then
+          echo "Synthetic data not found. Please ensure data exists."
+          exit 1
+        fi
+
+    - name: Run Advanced Test Orchestrator
+      env:
+        HALT_ON_CRITICAL: ${{ github.event.inputs.halt_on_critical }}
+        MAX_ANOMALY_RATE: ${{ github.event.inputs.max_anomaly_rate }}
+        LOG_LEVEL: ${{ github.event.inputs.log_level }}
+      run: |
+        mkdir -p logs
+        cd src
+
+        # Create dynamic config based on inputs
+        cat > test_config.py << EOF
+config = {
+    'log_dir': '../logs',
+    'halt_on_critical': ${HALT_ON_CRITICAL:-false},
+    'validation': {
+        'extract': {
+            'enabled': True,
+            'min_records': 1000,
+            'required_columns': ['id', 'report_date', 'transaction_amount', 'account_type', 'account_balance', 'region']
+        },
+        'transform': {
+            'enabled': True,
+            'max_anomaly_rate': ${MAX_ANOMALY_RATE:-10.0},
+            'iqr_factor': 1.5
+        },
+        'load': {
+            'enabled': True
+        }
+    }
+}
+EOF
+
+        # Run the test orchestrator
+        python test_orchestrator.py
+
+    - name: Upload Test Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: advanced-test-reports
+        path: |
+          logs/test_orchestrator_report.txt
+          logs/test_dashboard.html
+          logs/evaluation_plots.png
+          logs/test_orchestrator.log
+          data/test_data_with_anomalies.csv
+
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "## Advanced ETL Testing Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f "logs/test_orchestrator_report.txt" ]; then
+          echo "### Test Orchestrator Report" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          head -20 logs/test_orchestrator_report.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        if [ -f "logs/test_dashboard.html" ]; then
+          echo "### 📊 Interactive Dashboard" >> $GITHUB_STEP_SUMMARY
+          echo "View the detailed HTML dashboard in the artifacts." >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Configuration Used:" >> $GITHUB_STEP_SUMMARY
+        echo "- Halt on Critical: ${{ github.event.inputs.halt_on_critical }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Max Anomaly Rate: ${{ github.event.inputs.max_anomaly_rate }}%" >> $GITHUB_STEP_SUMMARY
+        echo "- Log Level: ${{ github.event.inputs.log_level }}" >> $GITHUB_STEP_SUMMARY

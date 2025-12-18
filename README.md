@@ -18,7 +18,8 @@ AIETLTest/
 ├── .github/
 │   └── workflows/
 │       ├── etl-workflow.yml         # GitHub Actions CI/CD for CSV processing
-│       └── db-testing-workflow.yml  # Database anomaly testing workflow
+│       ├── db-testing-workflow.yml  # Database anomaly testing workflow
+│       └── advanced-testing-workflow.yml # Advanced test orchestrator workflow
 ├── data/
 │   ├── synthetic_data.csv           # Input synthetic dataset
 │   ├── test_data_with_anomalies.csv # Output dataset with anomalies preserved (CSV)
@@ -216,6 +217,45 @@ The orchestrator generates comprehensive reports in `../logs/`:
 - **Latency Measurements**: Per-stage and total execution times
 - **Alert Analytics**: Severity distribution and failure analysis
 - **Data Quality Metrics**: Record counts, anomaly rates, validation pass/fail rates
+
+## Running from GitHub Actions
+
+### Option 1: Automatic Execution (Recommended)
+
+The test orchestrator runs automatically as part of the **ETL Pipeline** workflow:
+
+1. **Trigger**: Push to `main` branch or manual dispatch
+2. **Jobs**:
+   - `run-etl`: Basic ETL processing and unit tests
+   - `advanced-etl-testing`: Advanced test orchestrator with comprehensive validation
+3. **Artifacts**: Download reports from the Actions run
+
+### Option 2: Dedicated Advanced Testing Workflow
+
+For focused advanced testing, use the **Advanced ETL Testing** workflow:
+
+1. Go to **Actions** tab in your GitHub repository
+2. Select **"Advanced ETL Testing"** workflow
+3. Click **"Run workflow"**
+4. Configure parameters:
+   - **Halt on Critical**: Stop execution on critical failures
+   - **Max Anomaly Rate**: Threshold for anomaly detection alerts
+   - **Log Level**: DEBUG, INFO, WARNING, or ERROR
+
+### Available Workflows
+
+| Workflow | Trigger | Purpose | Artifacts |
+|----------|---------|---------|-----------|
+| **ETL Pipeline** | Push/PR + Manual | Basic ETL + Unit tests + Advanced testing | `etl-logs`, `test-orchestrator-reports` |
+| **Database Anomaly Scanning** | Manual | Database validation only | `db-anomaly-report` |
+| **Advanced ETL Testing** | Manual | Comprehensive test orchestrator only | `advanced-test-reports` |
+
+### Viewing Results
+
+1. **Go to Actions tab** in your repository
+2. **Click on the workflow run**
+3. **Download artifacts** from the bottom of the run page
+4. **Open HTML files** in your browser for interactive dashboards
 
 ## Testing
 
