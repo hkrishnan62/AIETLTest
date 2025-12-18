@@ -29,6 +29,7 @@ AIETLTest/
 ├── src/
 │   ├── orchestrator.py         # Main ETL orchestration script (CSV)
 │   ├── db_scanner.py           # Database anomaly scanning script
+│   ├── test_orchestrator.py    # Advanced test orchestrator with hooks and evaluation
 │   ├── setup_db.py             # Database setup from CSV
 │   ├── add_anomalies.py        # Add regulatory anomalies to database
 │   └── validation/
@@ -36,7 +37,8 @@ AIETLTest/
 │       └── rule_validator.py   # Rule-based data validation
 ├── tests/
 │   ├── test_anomaly.py         # Unit tests for anomaly detection
-│   └── test_validation.py      # Unit tests for validation rules
+│   ├── test_validation.py      # Unit tests for validation rules
+│   └── test_test_orchestrator.py # Tests for advanced test orchestrator
 ├── requirements.txt            # Python dependencies
 └── README.md                   # This file
 ```
@@ -113,6 +115,107 @@ The pipeline validates:
 ### Anomaly Detection
 
 Uses Interquartile Range (IQR) method with a factor of 1.5 to detect statistical outliers in `transaction_amount` and `account_balance` columns.
+
+## Advanced Test Orchestrator
+
+The framework includes a sophisticated test orchestrator (`test_orchestrator.py`) that provides:
+
+### Features
+
+- **Stage-by-Stage Validation**: Triggers validation logic at each ETL stage (Extract, Transform, Load)
+- **Modular Hook System**: Extensible middleware-style hooks for custom validation and monitoring
+- **Alert Management**: Comprehensive alert logging with severity levels (critical, warning, info)
+- **Failure Handling**: Optional halting on critical failures with configurable thresholds
+- **Performance Evaluation**: Computes precision, recall, F1-score, and latency metrics
+- **Rich Reporting**: Generates text reports, HTML dashboards, and matplotlib visualizations
+- **Confusion Matrix**: Visual analysis of anomaly detection performance
+
+### Usage
+
+```python
+from src.test_orchestrator import TestOrchestrator, etl_hook
+
+# Configure the orchestrator
+config = {
+    'log_dir': '../logs',
+    'halt_on_critical': False,
+    'validation': {
+        'extract': {'enabled': True, 'min_records': 1000},
+        'transform': {'enabled': True, 'max_anomaly_rate': 10.0},
+        'load': {'enabled': True}
+    }
+}
+
+orchestrator = TestOrchestrator(config)
+
+# Register custom validation hooks
+@etl_hook('pre_extract')
+def data_quality_check(data, context):
+    alerts = []
+    # Custom validation logic
+    return data, alerts
+
+orchestrator.register_hook('pre_extract', data_quality_check)
+
+# Define ETL functions
+def extract_func():
+    return pd.read_csv('../data/synthetic_data.csv')
+
+def transform_func(data):
+    # Transform logic with anomaly detection
+    return data
+
+def load_func(data):
+    return '../data/processed_output.csv'
+
+# Run comprehensive ETL test
+results = orchestrator.run_etl_test(
+    extract_func=extract_func,
+    transform_func=transform_func,
+    load_func=load_func
+)
+
+print(f"Test Success: {results['success']}")
+print(f"Total Duration: {results['total_duration']:.3f}s")
+```
+
+### Hook System
+
+The orchestrator supports middleware-style hooks for maximum modularity:
+
+```python
+# Available hook stages:
+# - pre_extract, post_extract
+# - pre_transform, post_transform  
+# - pre_load, post_load
+
+@orchestrator.etl_hook('pre_transform')
+def custom_validation(data, context):
+    alerts = []
+    # Your custom validation logic
+    if some_condition:
+        alerts.append({
+            'type': 'custom_check',
+            'message': 'Custom validation failed',
+            'severity': 'warning'
+        })
+    return data, alerts
+```
+
+### Generated Reports
+
+The orchestrator generates comprehensive reports in `../logs/`:
+
+- **`test_orchestrator_report.txt`**: Detailed text report with metrics and alerts
+- **`evaluation_plots.png`**: Matplotlib visualizations including confusion matrices
+- **`test_dashboard.html`**: Interactive HTML dashboard with stage breakdowns
+
+### Evaluation Metrics
+
+- **Precision/Recall/F1-Score**: Anomaly detection performance metrics
+- **Latency Measurements**: Per-stage and total execution times
+- **Alert Analytics**: Severity distribution and failure analysis
+- **Data Quality Metrics**: Record counts, anomaly rates, validation pass/fail rates
 
 ## Testing
 

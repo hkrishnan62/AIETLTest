@@ -1,0 +1,16 @@
+2025-12-18 16:36:24,484 - TestOrchestrator - INFO - Registered hook for stage: pre_extract
+2025-12-18 16:36:24,484 - TestOrchestrator - INFO - Starting ETL test orchestration
+2025-12-18 16:36:24,485 - TestOrchestrator - INFO - Starting EXTRACT stage
+2025-12-18 16:36:24,485 - TestOrchestrator - INFO - Hook executed in 0.000s for pre_extract
+2025-12-18 16:36:24,619 - TestOrchestrator - INFO - Starting TRANSFORM stage
+2025-12-18 16:36:24,656 - TestOrchestrator - ERROR - ETL test failed: 'metrics'
+2025-12-18 16:36:38,479 - TestOrchestrator - INFO - Registered hook for stage: pre_extract
+2025-12-18 16:36:38,479 - TestOrchestrator - INFO - Starting ETL test orchestration
+2025-12-18 16:36:38,480 - TestOrchestrator - INFO - Starting EXTRACT stage
+2025-12-18 16:36:38,480 - TestOrchestrator - INFO - Hook executed in 0.000s for pre_extract
+2025-12-18 16:36:38,535 - TestOrchestrator - INFO - Starting TRANSFORM stage
+2025-12-18 16:36:38,551 - TestOrchestrator - INFO - Starting LOAD stage
+2025-12-18 16:36:38,551 - TestOrchestrator - INFO - Text report generated: ../logs/test_orchestrator_report.txt
+2025-12-18 16:36:39,482 - TestOrchestrator - INFO - Visualizations generated: ../logs/evaluation_plots.png
+2025-12-18 16:36:39,482 - TestOrchestrator - INFO - HTML dashboard generated: ../logs/test_dashboard.html
+2025-12-18 16:36:39,482 - TestOrchestrator - INFO - ETL test completed in 0.071s

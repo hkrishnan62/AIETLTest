@@ -1,0 +1,48 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>ETL Test Orchestrator Dashboard</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .metric { background: #f0f0f0; padding: 10px; margin: 10px; border-radius: 5px; }
+                .stage { border: 1px solid #ddd; padding: 15px; margin: 10px; }
+                .alert-critical { color: red; }
+                .alert-warning { color: orange; }
+                .alert-info { color: blue; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+            </style>
+        </head>
+        <body>
+            <h1>ETL Test Orchestrator Dashboard</h1>
+            <p><strong>Generated:</strong> 2025-12-18 16:36:39.482413</p>
+
+            <h2>Overall Metrics</h2>
+            <div style="display: flex; flex-wrap: wrap;">
+        <div class="metric"><strong>total_alerts:</strong> 1</div><div class="metric"><strong>critical_alerts:</strong> 0</div><div class="metric"><strong>warning_alerts:</strong> 1</div><div class="metric"><strong>total_duration:</strong> 0.0715</div><div class="metric"><strong>stage_durations:</strong> {'extract': 0.0497286319732666, 'transform': 3.337860107421875e-06, 'load': 3.5762786865234375e-06}</div><div class="metric"><strong>latency_per_record:</strong> 0.0000</div></div><h2>Stage Results</h2>
+            <div class="stage">
+                <h3 style="color: green;">EXTRACT Stage</h3>
+                <p><strong>Duration:</strong> 0.050s</p>
+                <p><strong>Status:</strong> PASSED</p>
+                <p><strong>Alerts:</strong> 1</p>
+            <h4>Metrics</h4><table><tr><td>record_count</td><td>50003</td></tr><tr><td>column_count</td><td>8</td></tr><tr><td>null_percentage</td><td>0.10024398536087833</td></tr></table><h4>Alerts</h4><table><tr><th>Type</th><th>Severity</th><th>Message</th></tr>
+                    <tr class="alert-warning">
+                        <td>data_check</td>
+                        <td>warning</td>
+                        <td>No data provided</td>
+                    </tr>
+                    </table></div>
+            <div class="stage">
+                <h3 style="color: green;">TRANSFORM Stage</h3>
+                <p><strong>Duration:</strong> 0.000s</p>
+                <p><strong>Status:</strong> PASSED</p>
+                <p><strong>Alerts:</strong> 0</p>
+            <h4>Metrics</h4><table><tr><td>total_records</td><td>50003</td></tr><tr><td>rule_based_anomalies</td><td>2078</td></tr><tr><td>statistical_anomalies</td><td>902</td></tr><tr><td>total_anomalies</td><td>2980</td></tr><tr><td>anomaly_percentage</td><td>5.959642421454713</td></tr></table></div>
+            <div class="stage">
+                <h3 style="color: green;">LOAD Stage</h3>
+                <p><strong>Duration:</strong> 0.000s</p>
+                <p><strong>Status:</strong> PASSED</p>
+                <p><strong>Alerts:</strong> 0</p>
+            <h4>Metrics</h4><table><tr><td>file_exists</td><td>False</td></tr></table></div></body></html>

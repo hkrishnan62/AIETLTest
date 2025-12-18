@@ -1,0 +1,46 @@
+ETL Test Orchestrator Report
+==================================================
+
+Generated: 2025-12-18 16:36:38.551648
+
+OVERALL METRICS
+--------------------
+total_alerts: 1
+critical_alerts: 0
+warning_alerts: 1
+total_duration: 0.0715
+stage_durations: {'extract': 0.0497286319732666, 'transform': 3.337860107421875e-06, 'load': 3.5762786865234375e-06}
+latency_per_record: 0.0000
+
+EXTRACT STAGE
+-------------
+Duration: 0.050s
+Passed: True
+Alerts: 1
+Metrics:
+  record_count: 50003
+  column_count: 8
+  null_percentage: 0.10024398536087833
+Alerts:
+  [WARNING] No data provided
+
+TRANSFORM STAGE
+---------------
+Duration: 0.000s
+Passed: True
+Alerts: 0
+Metrics:
+  total_records: 50003
+  rule_based_anomalies: 2078
+  statistical_anomalies: 902
+  total_anomalies: 2980
+  anomaly_percentage: 5.959642421454713
+
+LOAD STAGE
+----------
+Duration: 0.000s
+Passed: True
+Alerts: 0
+Metrics:
+  file_exists: False
+
