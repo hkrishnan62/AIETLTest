@@ -1,4 +1,4 @@
-name: Database Anomaly Testing
+name: Database Anomaly Scanning
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
         default: 'transactions'
 
 jobs:
-  db-anomaly-test:
+  db-anomaly-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,12 +30,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas
 
-    - name: Set up test database
+    - name: Check database exists
       run: |
-        mkdir -p data logs
-        cd src
-        python setup_db.py
-        python add_anomalies.py
+        if [ ! -f "data/transactions.db" ]; then
+          echo "Database not found at data/transactions.db"
+          echo "Please ensure the database exists before running DB testing workflow."
+          exit 1
+        fi
 
     - name: Run database anomaly scan
       run: |
