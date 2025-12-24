@@ -1,6 +1,10 @@
-AIETLTest
+## AI Powered ETL Testing Validation
 
-An AI-powered ETL testing framework for data processing with built-in anomaly detection and regulatory compliance validation.
+An AI-powered ETL testing framework that combines rule-based validation and statistical anomaly detection to help teams
+catch data quality issues early, surface potential regulatory risks (AML, structuring, sanctions patterns), and
+produce actionable reports for engineers, analysts, and compliance reviewers. Designed for easy integration into
+CI pipelines and reproducible testing, it preserves anomalous records so detection logic can be continuously
+validated and unit-tested.
 
 ## Features
 
