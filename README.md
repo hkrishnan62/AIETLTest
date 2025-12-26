@@ -47,7 +47,7 @@ ETL_AnomalyDetection_AI
 ├── requirements.txt            # Python dependencies
 └── README.md                   # This file
 ```
-
+![FinAccAI Architecture](docs/Architecture_Diagram.png)
 
 
 ## Installation
