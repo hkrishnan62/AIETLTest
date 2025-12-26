@@ -386,20 +386,19 @@ class UnifiedValidator:
             print(f"  Slowest: {max(time_taken):.4f}s")
 
     def save_report(self):
-        """Save validation report"""
+        """Save validation report (JSON and HTML)"""
+        import json
+        # JSON report (if requested)
         if self.args.output:
             print(f"\n{BOLD}[6] SAVING REPORT{RESET}")
             print("-" * 100)
-
             try:
-                # Convert numpy int64 to native Python int for JSON serialization
                 results_serializable = {}
                 for method, data in self.results.items():
                     results_serializable[method] = {
                         'anomalies': int(data.get('anomalies', 0)),
                         'time': float(data.get('time', 0))
                     }
-
                 report_data = {
                     'timestamp': datetime.now().isoformat(),
                     'data_source': self.data_source,
@@ -408,14 +407,90 @@ class UnifiedValidator:
                     'numeric_columns': self.numeric_cols,
                     'results': results_serializable
                 }
-
-                import json
                 with open(self.args.output, 'w') as f:
                     json.dump(report_data, f, indent=2)
-
                 print(f"✓ Report saved: {self.args.output}")
             except Exception as e:
                 print(f"{RED}✗ Error saving report: {e}{RESET}")
+
+        # HTML report (always or if --html-output is specified)
+        html_path = getattr(self.args, 'html_output', None)
+        if not html_path:
+            html_path = 'logs/validation_report.html'
+        try:
+            os.makedirs(os.path.dirname(html_path), exist_ok=True)
+            html = self._generate_html_report()
+            with open(html_path, 'w', encoding='utf-8') as f:
+                f.write(html)
+            print(f"✓ HTML report saved: {html_path}")
+        except Exception as e:
+            print(f"{RED}✗ Error saving HTML report: {e}{RESET}")
+
+    def _generate_html_report(self):
+        """Generate a detailed HTML report with sections and styling"""
+        style = '''<style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        h1, h2, h3 { color: #2c3e50; }
+        table { border-collapse: collapse; width: 100%; margin: 24px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        th { background: #e9ecef; }
+        tr:nth-child(even) { background: #f2f2f2; }
+        .section { margin-bottom: 32px; }
+        .summary { background: #e3fcec; padding: 16px; border-radius: 6px; margin-bottom: 24px; }
+        .footer { text-align: center; color: #888; margin-top: 40px; font-size: 0.95em; }
+        </style>'''
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        summary = f'''
+        <div class="summary">
+            <b>Validation Run:</b> {timestamp}<br>
+            <b>Data Source:</b> {self.data_source}<br>
+            <b>Records:</b> {len(self.df)}<br>
+            <b>Columns:</b> {len(self.df.columns)}<br>
+            <b>Numeric Columns:</b> {', '.join(self.numeric_cols)}
+        </div>'''
+        # Results Table
+        table_rows = ''
+        for method, data in self.results.items():
+            table_rows += f'<tr><td>{method}</td><td>{data.get("anomalies", 0)}</td><td>{data.get("time", 0):.4f}s</td></tr>'
+        results_table = f'''
+        <table>
+            <tr><th>Method</th><th>Anomalies</th><th>Execution Time</th></tr>
+            {table_rows}
+        </table>'''
+        # Statistics
+        anomaly_counts = [r['anomalies'] for r in self.results.values() if 'anomalies' in r]
+        time_taken = [r['time'] for r in self.results.values() if 'time' in r]
+        stats_html = ''
+        if anomaly_counts:
+            stats_html += f'<li><b>Average anomalies:</b> {np.mean(anomaly_counts):.1f}</li>'
+            stats_html += f'<li><b>Min anomalies:</b> {min(anomaly_counts)}</li>'
+            stats_html += f'<li><b>Max anomalies:</b> {max(anomaly_counts)}</li>'
+            stats_html += f'<li><b>Std Dev:</b> {np.std(anomaly_counts):.2f}</li>'
+        if time_taken:
+            stats_html += f'<li><b>Total execution time:</b> {sum(time_taken):.2f}s</li>'
+            stats_html += f'<li><b>Average per method:</b> {np.mean(time_taken):.4f}s</li>'
+            stats_html += f'<li><b>Fastest:</b> {min(time_taken):.4f}s</li>'
+            stats_html += f'<li><b>Slowest:</b> {max(time_taken):.4f}s</li>'
+        stats_section = f'<ul>{stats_html}</ul>' if stats_html else ''
+        # HTML Layout
+        html = f'''
+        <html><head><meta charset="utf-8"><title>Anomaly Detection Validation Report</title>{style}</head>
+        <body><div class="container">
+        <h1>Anomaly Detection Validation Report</h1>
+        {summary}
+        <div class="section">
+            <h2>Detection Results</h2>
+            {results_table}
+        </div>
+        <div class="section">
+            <h2>Statistics</h2>
+            {stats_section}
+        </div>
+        <div class="footer">Generated by Unified Validation Script &copy; {datetime.now().year}</div>
+        </div></body></html>
+        '''
+        return html
 
     def run(self):
         """Run complete validation"""
@@ -474,6 +549,7 @@ Examples:
     parser.add_argument('--table', type=str, default='transactions',
                        help='Table name in database (default: transactions)')
     parser.add_argument('--output', type=str, help='Output file for JSON report')
+    parser.add_argument('--html-output', type=str, help='Output file for HTML report (default: logs/validation_report.html)')
     parser.add_argument('--compare', action='store_true',
                        help='Enable detailed comparison output')
 

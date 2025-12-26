@@ -673,10 +673,17 @@ Autoencoder         │ ⚠ Slow   │ ⚡⚡⚡     │ Non-linear   │ Comple
 
 ### CSV Testing Framework
 
-Run the unified validation script for CSV anomaly detection:
+
+Run the unified validation script for CSV anomaly detection (generates a detailed HTML report by default in logs/validation_report.html):
 
 ```bash
 python scripts/unified_validation.py --csv data/cleaned_data.csv
+```
+
+To specify a custom HTML report location:
+
+```bash
+python scripts/unified_validation.py --csv data/cleaned_data.csv --html-output my_report.html
 ```
 
 This will:
