@@ -84,6 +84,7 @@ jobs:
         path: |
           validation_report.json
           VALIDATION_RESULTS.md
+          logs/validation_report.html
 
     - name: Comment on PR
       if: github.event_name == 'pull_request'
