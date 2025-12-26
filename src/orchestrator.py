@@ -20,10 +20,17 @@ class ETLOrchestrator:
         print(f"Extracted {len(df)} records from {self.data_path}")
         return df
 
-    def transform(self, df):
+    def transform(self, df, use_ml=False, ml_method=None):
         """
         Apply validation rules and anomaly detection, then generate detailed anomaly report.
-        Returns metrics and anomaly report (preserves all data for testing).
+        
+        Args:
+            df: Input DataFrame
+            use_ml: If True, use ML-based anomaly detection instead of IQR
+            ml_method: 'isolation_forest', 'clustering', or 'autoencoder'
+        
+        Returns:
+            metrics: Dictionary with anomaly detection results
         """
         # Define validation rules
         required_cols = ['id', 'report_date', 'transaction_amount', 'account_type', 'account_balance', 'region']
@@ -45,7 +52,14 @@ class ETLOrchestrator:
         # Statistical anomaly detection on numeric columns
         detector = AnomalyDetector(factor=1.5)
         numeric_cols = ['transaction_amount', 'account_balance']
-        anomaly_mask_stats = detector.detect(df, columns=numeric_cols)
+        
+        if use_ml and ml_method:
+            # Use ML-based anomaly detection
+            detector = AnomalyDetector(method=ml_method, ml_params={'contamination': 0.05})
+            anomaly_mask_stats = detector.detect(df, columns=numeric_cols + ['risk_score', 'account_age'] if ml_method == 'autoencoder' else numeric_cols)
+        else:
+            # Default IQR-based detection
+            anomaly_mask_stats = detector.detect(df, columns=numeric_cols)
 
         # Create detailed anomaly report
         anomaly_report = self.create_detailed_anomaly_report(df, results, anomaly_mask_stats)
