@@ -1,13 +1,16 @@
 ## AI Powered ETL Testing Validation
 
-### What Is This Project? (In Simple Terms)
+An AI-powered ETL testing framework that combines rule-based validation, statistical analysis, machine learning, and advanced AI techniques to help teams catch data quality issues early, surface potential regulatory risks (AML, structuring, sanctions patterns), and produce actionable reports for engineers, analysts, and compliance reviewers. Designed for easy integration into CI pipelines and reproducible testing, it preserves anomalous records so detection logic can be continuously validated and unit-tested.
 
-Imagine you're a bank receiving thousands of transactions every day. Some of these transactions are suspicious - unusual amounts, weird patterns, or risky customers. **How do you catch them all?**
+### What Is This Project? 
 
-Traditional systems use one simple rule: "Flag transactions over $10,000." But this misses:
-- Small suspicious transactions cleverly split into many parts
-- Unusual patterns even for normal amounts (like someone sending their entire paycheck to a stranger)
-- Complex fraud involving multiple accounts working together
+The bank handles thousands of daily transactions which you need to process. The system contains several transactions which appear questionable because they show unexplained large transactions and abnormal transaction sequences and high-risk customer activity.
+ **How do we catch them all?**
+
+The traditional system bases its operations on a single rule which demands the reporting of all transactions that surpass $10,000. The analysis fails to consider.
+- The system detects small unexplained transactions which get divided into multiple separate transactions.
+- The system identifies irregular payment behavior through which an employee sends their entire paycheck to someone they do not know.
+- The system faces complex fraud which happens when multiple accounts join forces to execute illegal operations.
 
 **This framework uses AI and Machine Learning to catch ALL these types of anomalies.**
 
@@ -29,6 +32,7 @@ All working together as a team to spot suspicious activity. Each method is diffe
 3. **Results Are Compared** - Shows which anomalies are caught by which methods
 4. **Report Is Generated** - JSON file with all findings and confidence scores
 5. **You Review Findings** - Easy-to-read comparison shows suspicious records
+
 
 ---
 
@@ -68,7 +72,7 @@ All working together as a team to spot suspicious activity. Each method is diffe
 
 ---
 
-## An AI-powered ETL testing framework that combines rule-based validation, statistical analysis, machine learning, and advanced AI techniques to help teams catch data quality issues early, surface potential regulatory risks (AML, structuring, sanctions patterns), and produce actionable reports for engineers, analysts, and compliance reviewers. Designed for easy integration into CI pipelines and reproducible testing, it preserves anomalous records so detection logic can be continuously validated and unit-tested.
+
 
 ## Quick Start - Unified Validation
 
@@ -370,7 +374,9 @@ Ensemble AI                 • Maximize confidence
 Neural-Symbolic             • Combine neural networks + logic
                             • Need formal verification
                             • Critical decision-making
+
 ```
+
 Method              │ Speed     │ Coverage  │ Type         │ Best For
 ──────────────────────────────────────────────────────────────────────────
 Rule-based          │ ⚡⚡⚡    │ Medium    │ Structural   │ Validation
