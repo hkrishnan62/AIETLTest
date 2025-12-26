@@ -48,6 +48,67 @@ ETL_AnomalyDetection_AI
 └── README.md                   # This file
 ```
 
+flowchart LR
+  %% ETL Anomaly Detection AI - High-level Architecture
+
+  subgraph Inputs["Inputs"]
+    CSV["CSV file(s)\n(data/synthetic_data.csv)"] 
+    DB["SQLite DB / Tables\n(data/transactions.db)"]
+  end
+
+  subgraph CI["CI/CD & Automation"]
+    GA["GitHub Actions Workflows\n- etl-workflow.yml (CSV)\n- db-testing-workflow.yml (DB)\n- advanced-testing-workflow.yml"] 
+    T["pytest unit tests\n(test_anomaly.py, test_validation.py,\n test_test_orchestrator.py)"]
+  end
+
+  subgraph Core["Core Validation & Detection (src/validation)"]
+    RV["Rule Validator\n(required columns, ranges,\nallowed values)"]
+    AD["Statistical Anomaly Detector\n(IQR outlier detection)"]
+  end
+
+  subgraph CSVPath["CSV Processing Path (src/orchestrator.py)"]
+    EX1["Extract\nRead CSV"]
+    TR1["Transform / Prep\n(feature prep, typing)"]
+    DET1["Detect\nRules + Stats"]
+    REG1["Regulatory Classification\n(AML / structuring / sanctions patterns)\n+ Severity scoring"]
+    REP1["Generate Report\nHTML report (logs/csv_anomaly_report.html)"]
+    OUT1["Persist Output\nPreserve anomalies in full dataset\n(data/test_data_with_anomalies.csv)"]
+  end
+
+  subgraph DBPath["Database Processing Path"]
+    SETUP["setup_db.py\nLoad CSV → SQLite"]
+    ADD["add_anomalies.py\nInject regulatory anomalies\n(for validation/testing)"]
+    SCAN["db_scanner.py\nScan tables for anomalies"]
+    REP2["Generate Report\nHTML report (logs/db_anomaly_report.html)"]
+  end
+
+  subgraph Advanced["Advanced Test Orchestration (src/test_orchestrator.py)"]
+    HOOKS["Pre/Post Hooks\nextract / transform / load"]
+    EVAL["Evaluation Metrics\nprecision / recall / F1\n+ plots & summaries (CI artifacts)"]
+  end
+
+  %% Flows
+  CSV --> EX1 --> TR1 --> DET1
+  DET1 --> RV
+  DET1 --> AD
+  RV --> REG1
+  AD --> REG1
+  REG1 --> REP1 --> OUT1
+
+  CSV --> SETUP --> DB
+  DB --> SCAN
+  SCAN --> RV
+  SCAN --> AD
+  SCAN --> REP2
+  ADD --> DB
+
+  GA --> T
+  GA --> EX1
+  GA --> SCAN
+  GA --> HOOKS
+  HOOKS --> EVAL
+  EVAL --> REP1
+
 ## Installation
 
 1. Clone the repository:
