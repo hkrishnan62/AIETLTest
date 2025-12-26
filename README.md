@@ -175,13 +175,6 @@ pytest tests/test_validation.py
 - Add tests for behavioral changes.
 - Keep changes focused and documented.
 
-## Next Steps / Tips
 
-- Try adding a custom `etl_hook` in `src/test_orchestrator.py` to simulate domain-specific checks.
-- Use the preserved anomalous CSV in `data/test_data_with_anomalies.csv` as a reproducible test fixture.
-
----
-If you want, I can also add badges, a short demo GIF, or a condensed one-page Quick Start with screenshots. Tell me which you'd like next.
-```
 
 
