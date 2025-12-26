@@ -391,13 +391,6 @@ Neural-Symbolic             • Combine neural networks + logic
 
 
 
-|Method │ Speed │ Coverage │ Type │ Best For|
-|-------|------|------|------|------|-------|
-|Rule-based          │ ⚡⚡⚡  Medium   │ Structural   │ Validation|
-|IQR                 │ ⚡⚡⚡ │ Low     │ Univariate   │ Simple cases|
-|Isolation Forest ⭐ │ ⚡⚡   │ ⚡⚡⚡  │ Multivariate│ General use|
-|Clustering          │ ⚡⚡⚡  │ Medium  │ Behavioral  │ Real-time|
-|Autoencoder         │ ⚠ Slow  │ ⚡⚡⚡ │ Non-linear  │ Complex patterns|
 
 
 ## Installation
