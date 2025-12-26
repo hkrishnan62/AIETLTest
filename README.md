@@ -389,16 +389,16 @@ Neural-Symbolic             • Combine neural networks + logic
                             • Need formal verification
                             • Critical decision-making
 
-```
+
 
 |Method │ Speed │ Coverage │ Type │ Best For|
 |-------|------|------|------|------|-------|
-|Rule-based          │ ⚡⚡⚡    │ Medium    │ Structural   │ Validation|
-|IQR                 │ ⚡⚡⚡    │ Low       │ Univariate   │ Simple cases|
-|Isolation Forest ⭐ │ ⚡⚡      │ ⚡⚡⚡     │ Multivariate │ General use|
-|Clustering          │ ⚡⚡⚡    │ Medium    │ Behavioral   │ Real-time|
-|Autoencoder         │ ⚠ Slow   │ ⚡⚡⚡     │ Non-linear   │ Complex patterns|
-```
+|Rule-based          │ ⚡⚡⚡  Medium   │ Structural   │ Validation|
+|IQR                 │ ⚡⚡⚡ │ Low     │ Univariate   │ Simple cases|
+|Isolation Forest ⭐ │ ⚡⚡   │ ⚡⚡⚡  │ Multivariate│ General use|
+|Clustering          │ ⚡⚡⚡  │ Medium  │ Behavioral  │ Real-time|
+|Autoencoder         │ ⚠ Slow  │ ⚡⚡⚡ │ Non-linear  │ Complex patterns|
+
 
 ## Installation
 
