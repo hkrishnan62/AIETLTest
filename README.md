@@ -334,7 +334,7 @@ On 50K-record datasets:
 
 ### Complete System Architecture
 
-![Architecture](data/Arch_new.png)
+![Architecture](data/Ach_new.png)
 
 ### Data Flow Example: One Transaction
 
